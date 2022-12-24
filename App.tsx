@@ -25,6 +25,8 @@ const environment = buildEnvironment();
 
 function buildEnvironment(): Environment {
   const fetchQuery: FetchFunction = (operation, variables) => {
+    console.log(backEnd.url);
+    console.log(JSON.stringify(operation));
     return fetch(`http://${backEnd.url}/api`, {
       method: "POST",
       headers: {

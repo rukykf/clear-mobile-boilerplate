@@ -9,8 +9,8 @@ import {
 import { OperationType } from "relay-runtime";
 
 const HomeQuery = graphql`
-  query HomeQuery {
-    dummy
+  query HomeHelloQuery {
+    hello(number: 10, word: "a word")
   }
 `;
 
