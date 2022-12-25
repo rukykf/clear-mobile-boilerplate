@@ -1,5 +1,6 @@
 export type RootParamList = {
   Home: undefined;
-  ImageComparison: undefined;
-  Photos: undefined;
+  ComparePhotoWithOldEntry: undefined;
+  NewPhotoEntry: undefined;
+  ListEntries: undefined;
 };

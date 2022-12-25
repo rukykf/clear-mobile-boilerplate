@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Camera, CameraType } from "expo-camera";
 import React from "react";
 import {
+  ActivityIndicator,
   Alert,
   Button,
   ImageBackground,
@@ -11,18 +12,26 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { graphql, useMutation } from "react-relay";
 
 let camera: Camera | null = null;
 
-export default function App() {
-  let [previewVisible, setPreviewVisible] = React.useState(false);
-  let [capturedImage, setCapturedImage] = React.useState<any>(null);
-  let [permission, requestPermission] = Camera.useCameraPermissions();
-  let [cameraType, setCameraType] = React.useState(CameraType.back);
-  let navigation = useNavigation();
+const NewPhotoEntryQuery = graphql`
+  mutation NewPhotoEntryQuery($input: String!) {
+    createNewEntry(base64Image: $input)
+  }
+`;
 
-  const takePictureAsync = async () => {
-    console.log("Checking in...");
+export default function NewPhotoEntry(): JSX.Element {
+  const [previewVisible, setPreviewVisible] = React.useState(false);
+  const [capturedImage, setCapturedImage] = React.useState<any>(null);
+  const [permission, requestPermission] = Camera.useCameraPermissions();
+  const [cameraType, setCameraType] = React.useState(CameraType.back);
+  const [commitMutation, isUploadingPhoto] = useMutation(NewPhotoEntryQuery);
+
+  const navigation = useNavigation();
+
+  const takePicture = async () => {
     if (camera) {
       const capturedPhoto = await camera.takePictureAsync({
         base64: true,
@@ -33,15 +42,31 @@ export default function App() {
     }
   };
 
-  const savePhoto = () => {
-    let photoBase64 = "data:image/jpg;base64," + capturedImage.base64;
-    console.log(photoBase64);
-    Alert.alert("Entry saved!");
-    navigation.navigate("Home");
+  const savePhoto = async () => {
+    commitMutation({
+      variables: { input: capturedImage.base64 },
+      onCompleted: resetAfterSuccessfulUpload,
+      onError: resetAfterFailedUpload,
+    });
   };
+
   const retakePicture = () => {
     setCapturedImage(null);
     setPreviewVisible(false);
+  };
+
+  const resetAfterSuccessfulUpload = () => {
+    Alert.alert(
+      "Image Uploaded Successfully! You can take another picture now or go back to the home screen with the back button"
+    );
+    retakePicture();
+  };
+
+  const resetAfterFailedUpload = () => {
+    Alert.alert(
+      "Something Went Wrong While Saving! Taking you back to the home screen..."
+    );
+    navigation.navigate("Home", {});
   };
 
   const switchCamera = () => {
@@ -72,6 +97,14 @@ export default function App() {
     );
   }
 
+  if (isUploadingPhoto) {
+    return (
+      <View>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       {previewVisible && capturedImage ? (
@@ -94,7 +127,7 @@ export default function App() {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={async () => {
-                await takePictureAsync();
+                await takePicture();
               }}
               style={styles.button}
             >
