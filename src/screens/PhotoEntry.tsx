@@ -6,7 +6,6 @@ export default function DisplayPhotoEntry({
 }: {
   entry: Entry;
 }): JSX.Element {
-  console.log("Inside entry content");
   return (
     <View>
       <Text>{JSON.stringify(entry)}</Text>

@@ -1,9 +1,16 @@
 import { useNavigation } from "@react-navigation/native";
+import * as SecureStore from "expo-secure-store";
 import React from "react";
-import { Button, View } from "react-native";
+import { Alert, Button, View } from "react-native";
 
 export default function Home(): JSX.Element {
   const navigation = useNavigation();
+
+  const logout = async () => {
+    await SecureStore.deleteItemAsync("auth-token");
+    Alert.alert("Logged out successfully!");
+    navigation.navigate("RegistrationLogin", {});
+  };
 
   return (
     <View>
@@ -23,6 +30,14 @@ export default function Home(): JSX.Element {
         <Button
           title="Compare Photo With Past Entry"
           onPress={() => navigation.navigate("ComparePhotoWithOldEntry", {})}
+        />
+      </View>
+      <View style={{ margin: 20 }}>
+        <Button
+          title="Logout"
+          onPress={async () => {
+            await logout();
+          }}
         />
       </View>
     </View>

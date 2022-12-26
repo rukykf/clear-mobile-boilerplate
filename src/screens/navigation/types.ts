@@ -3,4 +3,5 @@ export type RootParamList = {
   ComparePhotoWithOldEntry: undefined;
   NewPhotoEntry: undefined;
   ListEntries: undefined;
+  RegistrationLogin: undefined;
 };

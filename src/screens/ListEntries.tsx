@@ -41,10 +41,10 @@ function HomeContent({
 }: {
   queryReference: PreloadedQuery<OperationType, Record<string, unknown>>;
 }): JSX.Element {
-  console.log("Inside Home Content");
   const data = usePreloadedQuery(ListEntriesQuery, queryReference);
 
-  console.log("entries: ");
-  console.log(data);
+  // For some reason, react relay can't seem to retrieve the base64 Image with this query
+  // When I try this out with shorter / smaller sized strings, it's able to get the data
+  // And proceed with rendering. With the images, it's just loading forever.
   return <Text>{JSON.stringify(data)}</Text>;
 }

@@ -1,5 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import { Camera, CameraType } from "expo-camera";
+import * as SecureStore from "expo-secure-store";
+
 import React from "react";
 import {
   ActivityIndicator,
@@ -17,8 +19,8 @@ import { graphql, useMutation } from "react-relay";
 let camera: Camera | null = null;
 
 const NewPhotoEntryQuery = graphql`
-  mutation NewPhotoEntryQuery($input: String!) {
-    createNewEntry(base64Image: $input)
+  mutation NewPhotoEntryQuery($input: String!, $token: String!) {
+    createNewEntry(base64Image: $input, authToken: $token)
   }
 `;
 
@@ -36,15 +38,15 @@ export default function NewPhotoEntry(): JSX.Element {
       const capturedPhoto = await camera.takePictureAsync({
         base64: true,
       });
-      console.log(capturedPhoto);
       setPreviewVisible(true);
       setCapturedImage(capturedPhoto);
     }
   };
 
   const savePhoto = async () => {
+    const authToken = await SecureStore.getItemAsync("auth-token");
     commitMutation({
-      variables: { input: capturedImage.base64 },
+      variables: { input: capturedImage.base64, token: authToken },
       onCompleted: resetAfterSuccessfulUpload,
       onError: resetAfterFailedUpload,
     });
@@ -167,7 +169,6 @@ const styles = StyleSheet.create({
 });
 
 const CameraPreview = ({ photo, retakePicture, savePhoto }: any) => {
-  console.log("sdsfds", photo);
   return (
     <View
       style={{
