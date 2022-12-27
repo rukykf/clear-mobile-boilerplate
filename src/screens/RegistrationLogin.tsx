@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  View,
 } from "react-native";
 import { graphql, useMutation } from "react-relay";
 
@@ -87,6 +88,13 @@ export default function RegistrationLogin(): JSX.Element {
           onPress={loginOrRegisterUser}
         />
       )}
+
+      <View>
+        <Text>
+          The auth flow isn't wired up to a database. Just type in any username and
+          password, anything will work fine, so long as there's an actual input
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }
